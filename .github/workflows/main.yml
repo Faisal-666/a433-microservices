@@ -1,0 +1,46 @@
+#Nama
+name: karsajobs-ui
+
+#perizinan untuk mengakses repository
+permissions:
+  contents: read
+  packages: write
+
+#akan otomatis berjalan ketika ada perubahan pada branch karsajobsCI
+on:
+  push:
+    branches:
+      - karsajobs-ui-CI
+
+#Env Variabel untuk token github yanng akan dipakai untuk push image
+env:
+  NEW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+# linting Dockerfile
+  lint-dockerfile:
+    runs-on: ubuntu-latest #image
+    steps:
+      - name: Checkout repository #nama step
+        uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs-ui)
+        with:
+          ref: karsajobs-ui
+
+      - name: Lint Dockerfile #nama step
+        uses: hadolint/hadolint-action@v3.1.0 #action untuk linting Dockerfile
+        with:
+          dockerfile: Dockerfile
+          
+  build-app-karsajobs-ui:
+    runs-on: ubuntu-latest #image
+    steps:
+      - name: Checkout repository #nama step
+        uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs)
+        with:
+          ref: karsajobs-ui
+          
+      - name: List repository files #nama step
+        run: ls -la #list file di dalam repository
+
+      - name: Permission & Execute build script #nama step
+        run: chmod +x build_push_image_karsajobs_ui.sh && ./build_push_image_karsajobs_ui.sh #menjalankan script untuk build dan push image ke github packages
