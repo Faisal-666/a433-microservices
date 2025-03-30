@@ -55,9 +55,6 @@ jobs:
         uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs)
         with:
           ref: karsajobs
-          
-      - name: List repository files #nama step
-        run: ls -la #list file di dalam repository
 
       - name: Permission & Execute build script #nama step
         run: chmod +x build_push_image_karsajobs.sh && ./build_push_image_karsajobs.sh #menjalankan script untuk build dan push image ke github packages
