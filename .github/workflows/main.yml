@@ -1,0 +1,63 @@
+#Nama
+name: karsajobs 
+
+#perizinan untuk mengakses repository
+permissions:
+  contents: read
+  packages: write
+
+#akan otomatis berjalan ketika ada perubahan pada branch karsajobsCI
+on:
+  push:
+    branches:
+      - karsajobsCI
+
+#Env Variabel untuk token github yanng akan dipakai untuk push image
+env:
+  NEW_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Workflow untuk linting Dockerfile, testing aplikasi, dan build image
+jobs:
+# linting Dockerfile
+  lint-dockerfile:
+    runs-on: ubuntu-latest #image
+    steps:
+      - name: Checkout repository #nama step
+        uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs)
+        with:
+          ref: karsajobs
+
+      - name: Lint Dockerfile #nama step
+        uses: hadolint/hadolint-action@v3.1.0 #action untuk linting Dockerfile
+        with:
+          dockerfile: Dockerfile
+          
+  test-app:
+    runs-on: ubuntu-latest  #image
+    steps:
+      - name: Checkout repository #nama step
+        uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs)
+        with:
+          ref: karsajobs
+
+      - name: Set up Go #nama step
+        uses: actions/setup-go@v4 #action untuk setup go dengan version 1.15
+        with:
+          go-version: 1.15
+
+      - name: Run unit tests #nama step
+        run: go test -v -short --count=1 $(go list ./...) #unit test
+        
+  build-app-karsajobs:
+    runs-on: ubuntu-latest #image
+    steps:
+      - name: Checkout repository #nama step
+        uses: actions/checkout@v3 #checkout action dengan (ref) karsajobs branch (akan checkout branch karsajobs)
+        with:
+          ref: karsajobs
+          
+      - name: List repository files #nama step
+        run: ls -la #list file di dalam repository
+
+      - name: Permission & Execute build script #nama step
+        run: chmod +x build_push_image_karsajobs.sh && ./build_push_image_karsajobs.sh #menjalankan script untuk build dan push image ke github packages
